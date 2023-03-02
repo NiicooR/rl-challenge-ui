@@ -1,0 +1,10 @@
+{
+    "workbench.colorCustomizations": {
+        "[Material Theme Darker High Contrast]": {
+            "statusBar.debuggingBackground": "#212121"
+        },
+        "activityBar.background": "#2F1978",
+        "titleBar.activeBackground": "#4223A8",
+        "titleBar.activeForeground": "#FAF9FE"
+    }
+}
