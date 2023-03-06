@@ -4,11 +4,12 @@ import Form from 'react-bootstrap/Form';
 type SelectProps = {
   label: string;
   options: { key: string; value: string }[];
+  onChange: (value: string) => void;
 };
 
-export const Select = ({ label, options }: SelectProps) => {
+export const Select = ({ label, options, onChange }: SelectProps) => {
   return (
-    <Form.Select aria-label="Default select example">
+    <Form.Select onChange={(e) => onChange(e.target.value)} aria-label="Default select example">
       <option>{label}</option>
       {options.map((e) => {
         return (
