@@ -8,7 +8,7 @@ export const getProvider = () => {
 };
 
 export const getSelectedAddress = async (): Promise<string> => {
-  const account = (await (await getProvider()).eth.getAccounts()).find((e) => e);
+  const account = (await getProvider().eth.getAccounts()).find((e) => e);
   if (!account) throw new Error('Connect with Metamask');
   return account;
 };

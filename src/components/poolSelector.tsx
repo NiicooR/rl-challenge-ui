@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Select } from '../components/base/select';
-import { balanceOf } from '../services/erc20.service';
+import { GlobalContext } from '../context/global.context';
 import { getReservedData } from '../services/poolDataProvider.service';
 import { getAPYPercentage } from '../services/web3.utils';
 
 export const PoolSelector = () => {
-  const [pools, setPools] = useState([]);
+  const useGlobalContext = useContext(GlobalContext);
+  const [pools, setPools] = useState<{ key: string; value: string }[]>([]);
   const [poolAPY, setPoolApy] = useState('0');
 
   useEffect(() => {
@@ -22,6 +23,9 @@ export const PoolSelector = () => {
   }
 
   const handleOnChange = async (value: string) => {
+    const selected = pools.find((e) => e.key === value);
+    useGlobalContext?.setSelectedReserveToken({ name: selected!.value, address: selected!.key });
+
     const selectedPoolApy = await getReservedData(value);
     setPoolApy(selectedPoolApy);
   };
