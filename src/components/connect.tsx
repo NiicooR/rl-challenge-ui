@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Button from 'react-bootstrap/Button';
+import { GlobalContext } from '../context/global.context';
 
 export const Connect = () => {
   const [connectedAddress, setConnectedAddress] = useState('');
+  const useGlobalContext = useContext(GlobalContext);
 
   const connectWallet = async () => {
     if (window.ethereum) {
-      const accounts = await window.ethereum.request({
-        method: 'eth_requestAccounts',
-      });
-
-      if (accounts) {
-        setConnectedAddress(accounts.find((e: any) => e));
-      }
-      console.log(accounts);
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-
-      if (chainId !== '0x5') {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x5' }],
+      try {
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts',
         });
+
+        if (accounts) {
+          setConnectedAddress(accounts.find((e: any) => e));
+          useGlobalContext?.setIsConnected(true);
+        }
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
+        if (chainId !== '0x5') {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x5' }],
+          });
+        }
+      } catch (error) {
+        console.log('Error during connection');
       }
     } else {
       alert('Please install Metamask extension');
@@ -33,7 +39,7 @@ export const Connect = () => {
         <Button onClick={() => connectWallet()} variant="primary">
           Connect
         </Button>
-        <div>Connected address: {connectedAddress}</div>
+        <div>Connected address: {connectedAddress ? connectedAddress : '-'}</div>
       </div>
     </>
   );
