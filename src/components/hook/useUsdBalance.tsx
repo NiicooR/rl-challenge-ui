@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { debug } from 'console';
 import { useEffect, useState } from 'react';
 import { fromWei } from '../../services/web3.utils';
 
@@ -24,6 +23,7 @@ export const useUsdBalance = (): {
           `/api/usdBalance?${new URLSearchParams({
             assetSymbol,
           })}`,
+          { headers: { 'Content-Type': 'application/json' } },
         );
         const data = await res.json();
         if (res.status === 500) throw new Error();
