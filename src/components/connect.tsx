@@ -7,6 +7,11 @@ export const Connect = () => {
   const useGlobalContext = useContext(GlobalContext);
 
   const connectWallet = async () => {
+    if (connectedAddress) {
+      setConnectedAddress('');
+      useGlobalContext?.setIsConnected(false);
+      return;
+    }
     if (window.ethereum) {
       try {
         const accounts = await window.ethereum.request({
@@ -29,15 +34,15 @@ export const Connect = () => {
         console.log('Error during connection');
       }
     } else {
-      alert('Please install Metamask extension');
+      console.warn('Please install Metamask extension');
     }
   };
 
   return (
     <>
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-        <Button onClick={() => connectWallet()} variant="primary">
-          Connect
+        <Button onClick={() => connectWallet()} variant="primary" disabled={useGlobalContext?.isAppLoading}>
+          {!connectedAddress ? 'Connect' : 'Disconnect'}
         </Button>
         <div>Connected address: {connectedAddress ? connectedAddress : '-'}</div>
       </div>

@@ -6,7 +6,7 @@ import { getAPYPercentage } from '../services/web3.utils';
 
 export const PoolSelector = () => {
   const useGlobalContext = useContext(GlobalContext);
-  const [pools, setPools] = useState<{ key: string; value: string }[]>([]);
+  const [pools, setPools] = useState<{ reserveTokenAddress: string; name: string; tokenAddress: string }[]>([]);
   const [poolAPY, setPoolApy] = useState('0');
 
   useEffect(() => {
@@ -19,12 +19,12 @@ export const PoolSelector = () => {
       headers: { 'Content-Type': 'application/json' },
     });
     const data = await res.json();
-    setPools(data.map((e: any) => ({ key: e.reserveTokenAddress, value: e.name })));
+    setPools(data);
   }
 
   const handleOnChange = async (value: string) => {
-    const selected = pools.find((e) => e.key === value);
-    useGlobalContext?.setSelectedReserveToken({ name: selected!.value, address: selected!.key });
+    const selected = pools.find((e) => e.reserveTokenAddress === value);
+    selected && useGlobalContext?.setSelectedReserveToken(selected);
 
     const selectedPoolApy = await getReservedData(value);
     setPoolApy(selectedPoolApy);
@@ -32,7 +32,12 @@ export const PoolSelector = () => {
 
   return (
     <>
-      <Select onChange={handleOnChange} label="Select the pool" options={pools} />
+      <Select
+        disabled={useGlobalContext?.isAppLoading || false}
+        onChange={handleOnChange}
+        label="Select the pool"
+        options={pools.map((p) => ({ key: p.reserveTokenAddress, value: p.name }))}
+      />
       <div>{`APY: ${getAPYPercentage(Number(poolAPY)).toFixed(2)}`}</div>
     </>
   );

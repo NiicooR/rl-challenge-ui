@@ -18,6 +18,16 @@ export const name = async (tokenAddress: string) => {
   const contract = await getErc20Contract(tokenAddress);
   return await contract.methods.name().call();
 };
+
+export const symbol = async (tokenAddress: string) => {
+  const contract = await getErc20Contract(tokenAddress);
+  return (await contract.methods.symbol().call()) as string;
+};
+
+export const decimals = async (tokenAddress: string) => {
+  const contract = await getErc20Contract(tokenAddress);
+  return (await contract.methods.decimals().call()) as string;
+};
 export const nonces = async (tokenAddress: string) => {
   const contract = await getErc20Contract(tokenAddress);
   return await contract.methods.nonces(await getSelectedAddress()).call();
