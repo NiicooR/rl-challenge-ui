@@ -74,3 +74,21 @@ export const deposit = async (reserveToken: string, amount: string) => {
     console.error((er as Error).message);
   }
 };
+
+export const getUserAccountData = async (user: string) => {
+  const contract = await getPoolProxyAaveContract();
+  return (await contract.methods.getUserAccountData(user).call()) as {
+    totalCollateralBase: string;
+  };
+};
+
+export const withdraw = async (reserveToken: string, amount: string) => {
+  const connectedAddress = await getSelectedAddress();
+  const poolContract = await getPoolProxyAaveContract();
+
+  try {
+    await poolContract.methods.withdraw(reserveToken, amount, connectedAddress).send({ from: connectedAddress });
+  } catch (er) {
+    console.error((er as Error).message);
+  }
+};

@@ -2,21 +2,27 @@ import Button from 'react-bootstrap/Button';
 import { Connect } from '../components/connect';
 import { Input } from '../components/base/input';
 import { PoolSelector } from '../components/poolSelector';
-import { deposit } from '../services/poolProxyAave.service';
 import { GlobalContext } from '../context/global.context';
 import { useContext, useEffect, useState } from 'react';
 import { balanceOf } from '../services/erc20.service';
 import { fromWei, toWei } from '../services/web3.utils';
+import { Balance } from '../components/balance';
+import { useDeposit } from '../components/hook/useDeposit';
+import { Spinner } from 'react-bootstrap';
+import { withdraw } from '../services/poolProxyAave.service';
+import { getUserReserveData } from '../services/poolDataProvider.service';
+import { getSelectedAddress } from '../services/web3.service';
 
 export default function Home() {
   const useGlobalContext = useContext(GlobalContext);
   const [userBalance, setUserBalance] = useState('0');
   const [amountToSupply, setAmountToSupply] = useState('0');
+  const { triggerDeposit, isLoading: isDepositLoading } = useDeposit();
 
   useEffect(() => {
     (async () => {
       if (useGlobalContext?.selectedReserveToken) {
-        const balance = await balanceOf(useGlobalContext.selectedReserveToken!.address);
+        const balance = await balanceOf(useGlobalContext.selectedReserveToken!.reserveTokenAddress);
         setUserBalance(fromWei(balance));
         setAmountToSupply(fromWei(balance));
       }
@@ -34,29 +40,28 @@ export default function Home() {
               <>
                 <Input label={`${useGlobalContext.selectedReserveToken.name} available`} value={userBalance} disabled />
                 <Input
+                  disabled={useGlobalContext.isAppLoading}
                   onChange={(value) => setAmountToSupply(value)}
                   label={`${useGlobalContext.selectedReserveToken.name} to supply`}
                   value={amountToSupply}
                 />
-                {/* <Input label="_ Supplied" value="2000" disabled />
-                <Input label="Value in USD" value="2000" disabled /> */}
-                <Button
-                  variant="primary"
-                  onClick={async () => {
-                    if (BigInt(toWei(amountToSupply)) > BigInt(toWei(userBalance))) {
-                      console.error('Amount to supply is greater than available balance');
-                      return;
-                    }
-                    if (!useGlobalContext.selectedReserveToken?.address) return;
-                    try {
-                      await deposit(useGlobalContext.selectedReserveToken.address, toWei(amountToSupply));
-                    } catch (error) {
-                      console.error('Deposit has failed');
-                    }
-                  }}
-                >
-                  Supply
-                </Button>
+                <Balance />
+                {!isDepositLoading ? (
+                  <Button
+                    variant="primary"
+                    onClick={async () => {
+                      triggerDeposit(amountToSupply);
+                    }}
+                  >
+                    Supply
+                  </Button>
+                ) : (
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Spinner animation="border" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                  </div>
+                )}
               </>
             )}
           </>
