@@ -23,4 +23,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - http api request can be handled with an a proper service layer, cache can be used if needed.
 - metamask events could be listened in order to identify a wallet disconnection.
 - GlobalContext too global. Different and smaller context must be used. Use reducer as well must be used in case of context state and update actions are many.
-- Backend and Front end could share a typing library in order to handle the same dto and to fully type request bodies and responses.
+- Backend and Front end could share a typing library in order to handle the same dto and to fully type request bodies and responses
