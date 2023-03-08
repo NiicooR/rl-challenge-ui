@@ -1,8 +1,9 @@
-import React, { useContext, useState } from 'react';
+import BigNumber from 'bignumber.js';
+import { useContext, useState } from 'react';
 import { GlobalContext } from '../../context/global.context';
 import { balanceOf } from '../../services/erc20.service';
 import { deposit } from '../../services/poolProxyAave.service';
-import { addTokenToWallet, getSelectedAddress } from '../../services/web3.service';
+import { getSelectedAddress } from '../../services/web3.service';
 import { toWei } from '../../services/web3.utils';
 
 export const useDeposit = (): { triggerDeposit: (amountToSupply: string) => void; isLoading: boolean } => {
@@ -14,19 +15,21 @@ export const useDeposit = (): { triggerDeposit: (amountToSupply: string) => void
     setIsLoading(true);
     useGlobalContext.setIsAppLoading(true);
 
-    const { reserveTokenAddress, tokenAddress } = useGlobalContext.selectedReserveToken;
+    const { reserveTokenAddress } = useGlobalContext.selectedReserveToken;
 
     const balance = await balanceOf(reserveTokenAddress);
-    const weiBalance = toWei(balance);
+    const weiBalance = balance;
     const weiAmountToSupply = toWei(amountToSupply);
     if (BigInt(weiAmountToSupply) > BigInt(weiBalance)) {
       console.error('Amount to supply is greater than available balance');
+      setIsLoading(false);
+      useGlobalContext.setIsAppLoading(false);
       return;
     }
 
     try {
       await deposit(reserveTokenAddress, toWei(amountToSupply));
-      await fetch('http://localhost:3001/deposit', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_PROTOCOL}://${process.env.NEXT_PUBLIC_API_URL}/deposit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +41,6 @@ export const useDeposit = (): { triggerDeposit: (amountToSupply: string) => void
           tag: useGlobalContext.selectedReserveToken.name,
         }),
       });
-      await addTokenToWallet(tokenAddress);
     } catch (error) {
       console.error('Deposit has failed');
     } finally {

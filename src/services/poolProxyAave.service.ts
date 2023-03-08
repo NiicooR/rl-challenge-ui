@@ -67,19 +67,12 @@ export const deposit = async (reserveToken: string, amount: string) => {
   const { v, r, s } = await getRSVFromSignature(connectedAddress, JSON.stringify(permitParams));
 
   try {
-    const res = await poolContract.methods
+    await poolContract.methods
       .supplyWithPermit(reserveToken, amount, connectedAddress, referralCode, deadline, v, r, s)
       .send({ from: connectedAddress });
   } catch (er) {
     console.error((er as Error).message);
   }
-};
-
-export const getUserAccountData = async (user: string) => {
-  const contract = await getPoolProxyAaveContract();
-  return (await contract.methods.getUserAccountData(user).call()) as {
-    totalCollateralBase: string;
-  };
 };
 
 export const withdraw = async (reserveToken: string, amount: string) => {
