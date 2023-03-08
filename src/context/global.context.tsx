@@ -4,11 +4,11 @@ type SelectedReserveToken = { name: string; tokenAddress: string; reserveTokenAd
 
 type GlobalContextType = {
   isConnected: boolean;
-  setIsConnected: (_: boolean) => void;
+  setIsConnected: (isConnected: boolean) => void;
   selectedReserveToken: SelectedReserveToken | null;
-  setSelectedReserveToken: (_: SelectedReserveToken) => void;
+  setSelectedReserveToken: (selectedReserveToken: SelectedReserveToken) => void;
   isAppLoading: boolean;
-  setIsAppLoading: (_: boolean) => void;
+  setIsAppLoading: (isLoading: boolean) => void;
 };
 
 export const GlobalContext = createContext<GlobalContextType | null>(null);

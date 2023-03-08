@@ -14,7 +14,7 @@ export const PoolSelector = () => {
   }, []);
 
   async function fetchPools() {
-    const res = await fetch('http://localhost:3001/pool', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_PROTOCOL}://${process.env.NEXT_PUBLIC_API_URL}/pool`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });

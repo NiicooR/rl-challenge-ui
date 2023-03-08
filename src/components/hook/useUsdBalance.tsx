@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js';
+import { debug } from 'console';
 import { useEffect, useState } from 'react';
 import { fromWei } from '../../services/web3.utils';
 
@@ -11,23 +12,21 @@ export const useUsdBalance = (): {
   const [balanceToConvert, setBalanceToConvert] = useState('');
 
   const getUsdBalance = (assetSymbol: string, balanceToConvert: string) => {
-    {
-      setAssetSymbol(assetSymbol);
-      setBalanceToConvert(balanceToConvert);
-    }
+    setAssetSymbol(assetSymbol);
+    setBalanceToConvert(balanceToConvert);
   };
 
   useEffect(() => {
     (async () => {
       if (!assetSymbol || !balanceToConvert) return;
       try {
-        throw Error;
-        const res = await fetch(`https://rest.coinapi.io/v1/exchangerate/${assetSymbol}/USD`, {
-          headers: {
-            'X-CoinAPI-Key': 'B3E9AD73-4432-4622-A925-6A3845F9838D',
-          },
-        });
+        const res = await fetch(
+          `/api/usdBalance?${new URLSearchParams({
+            assetSymbol,
+          })}`,
+        );
         const data = await res.json();
+        if (res.status === 500) throw new Error();
         const convertedBalance = BigNumber(data.rate).multipliedBy(fromWei(balanceToConvert));
         setUsdBalance(convertedBalance.toString());
       } catch (error) {
