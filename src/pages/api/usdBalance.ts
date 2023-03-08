@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { assetSymbol } = req.body;
+  const { assetSymbol } = req.query;
 
   try {
     const isUsdFeatureEnabled = process.env.NEXT_PUBLIC_ENABLE_USD === 'true' || false;
